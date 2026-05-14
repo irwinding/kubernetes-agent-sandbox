@@ -7,7 +7,7 @@ packages = ["langchain_kubernetes_agent_sandbox"]
 
 [project]
 name = "langchain-kubernetes-agent-sandbox"
-version = "0.1.0"
+version = "0.1.1"
 description = "A LangChain sandbox tool that runs agent-generated code inside Kubernetes pods"
 readme = "README.md"
 requires-python = ">=3.12"
