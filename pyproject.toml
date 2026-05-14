@@ -8,9 +8,17 @@ packages = ["langchain_kubernetes_agent_sandbox"]
 [project]
 name = "kubernetes-agent-sandbox"
 version = "0.1.0"
-description = "Add your description here"
+description = "A LangChain sandbox tool that runs agent-generated code inside Kubernetes pods"
 readme = "README.md"
 requires-python = ">=3.12"
+license = {text="MIT"}
+authors = [{ name = "Irwin Ding", email = "dingirwin.99@gmail.com"}]
+keywords = ["langchain", "kubernetes", "sandbox", "agent"]
+classifiers = [
+    "Programming Language :: Python :: 3.12",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
 dependencies = [
     "deepagents>=0.6.1",
     "k8s-agent-sandbox>=0.4.5",
@@ -26,3 +34,7 @@ dev = [
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
+
+[project.urls]
+Homepage = "https://github.com/irwinding/kubernetes-agent-sandbox"
+Issues   = "https://github.com/irwinding/kubernetes-agent-sandbox/issues"
