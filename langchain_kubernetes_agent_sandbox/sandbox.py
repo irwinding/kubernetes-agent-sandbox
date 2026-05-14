@@ -11,7 +11,7 @@ class KubernetesAgentSandbox(BaseSandbox):
     def __init__(
         self, 
         *,
-        sandbox: k8s_agent_sandbox.Sandbox,
+        sandbox: k8s_agent_sandbox.sandbox.Sandbox,
         timeout: int = 300,
         ):
         self.sandbox = sandbox
