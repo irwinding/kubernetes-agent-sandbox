@@ -1,3 +1,7 @@
+import base64
+import os
+import shlex
+
 import k8s_agent_sandbox
 import requests
 from k8s_agent_sandbox.exceptions import SandboxRequestError
@@ -31,7 +35,7 @@ class KubernetesAgentSandbox(BaseSandbox):
     def execute(self, command: str, *, timeout: int | None = None) -> ExecuteResponse:
         effective_timeout = self._get_effective_timeout(timeout)
         try:
-            return self.sandbox.commands.run(command, timeout=effective_timeout)
+            result = self.sandbox.commands.run(command, timeout=effective_timeout)
         except SandboxRequestError as e:
             if isinstance(e.__cause__, requests.exceptions.Timeout):
                 return ExecuteResponse(
@@ -39,50 +43,42 @@ class KubernetesAgentSandbox(BaseSandbox):
                     exit_code=COMMAND_TIMEOUT_EXIT_CODE,
                 )
             raise
+        output = result.stdout if result.stdout else result.stderr
+        return ExecuteResponse(output=output, exit_code=result.exit_code)
 
     def upload_files(self, files: list[tuple[str, bytes]]) -> list[FileUploadResponse]:
-        upload_requests: list = []
-        responses: dict[str, FileUploadResponse] = {}
+        responses: list[FileUploadResponse] = []
         for path, content in files:
             if not path.startswith("/"):
-                responses[path] = FileUploadResponse(path=path, success=False, error="Path must be absolute")
+                responses.append(FileUploadResponse(path=path, error="invalid_path"))
                 continue
-            upload_requests.append((path, content))
-            responses[path] = FileUploadResponse(path=path, success=False, error=None)
-        
-        # Process upload requests
-        for path, content in upload_requests:
             try:
-                self.sandbox.filesystem.write(path, content)
-                responses[path] = FileUploadResponse(path=path, success=True, error=None)
-            except Exception as e:
-                responses[path] = FileUploadResponse(path=path, success=False, error=str(e))
-
-        return list(responses.values())
+                self.sandbox.files.write(path, content)
+                responses.append(FileUploadResponse(path=path))
+            except PermissionError:
+                responses.append(FileUploadResponse(path=path, error="permission_denied"))
+            except IsADirectoryError:
+                responses.append(FileUploadResponse(path=path, error="is_directory"))
+            except FileNotFoundError:
+                responses.append(FileUploadResponse(path=path, error="file_not_found"))
+        return responses
 
     def download_files(self, paths: list[str]) -> list[FileDownloadResponse]:
-        download_requests: list = []
-        responses: dict[str, FileDownloadResponse] = {}
-        
+        responses: list[FileDownloadResponse] = []
         for path in paths:
             if not path.startswith("/"):
-                responses[path] = FileDownloadResponse(path=path, content=None, error="Path must be absolute")
+                responses.append(FileDownloadResponse(path=path, error="invalid_path"))
                 continue
-            download_requests.append(path)
-            responses[path] = FileDownloadResponse(path=path, content=None, error=None)
-            
-        if not download_requests:
-            return responses
-
-        for path in download_requests:
-            file_exists = self.sandbox.filesystem.exists(path)
-            if not file_exists:
-                responses[path] = FileDownloadResponse(path=path, content=None, error="File does not exist")
+            if not self.sandbox.files.exists(path):
+                responses.append(FileDownloadResponse(path=path, error="file_not_found"))
                 continue
             try:
-                content = self.sandbox.filesystem.read(path)
-                responses[path] = FileDownloadResponse(path=path, content=content, error=None)
-            except Exception as e:
-                responses[path] = FileDownloadResponse(path=path, content=None, error=str(e))
-        
-        return list(responses.values())
+                content = self.sandbox.files.read(path)
+                responses.append(FileDownloadResponse(path=path, content=content))
+            except PermissionError:
+                responses.append(FileDownloadResponse(path=path, error="permission_denied"))
+            except IsADirectoryError:
+                responses.append(FileDownloadResponse(path=path, error="is_directory"))
+            except FileNotFoundError:
+                responses.append(FileDownloadResponse(path=path, error="file_not_found"))
+        return responses

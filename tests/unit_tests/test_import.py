@@ -3,6 +3,7 @@ from unittest.mock import MagicMock, patch
 import pytest
 import requests
 from k8s_agent_sandbox.exceptions import SandboxRequestError
+from k8s_agent_sandbox.models import ExecutionResult
 
 import langchain_kubernetes_agent_sandbox
 from langchain_kubernetes_agent_sandbox.sandbox import KubernetesAgentSandbox
@@ -22,19 +23,32 @@ def test_import_kubernetes_agent_sandbox():
     
 def test_execute_returns_stdout():
     sb, mock_sdk = _make_sandbox()
-    expected = ExecuteResponse(output="hello world", exit_code=0)
-    mock_sdk.commands.run.return_value = expected
+    mock_sdk.commands.run.return_value = ExecutionResult(
+        stdout="hello world", stderr="", exit_code=0
+    )
 
     result = sb.execute("echo hello world")
 
-    assert result is expected
-    mock_sdk.commands.run.assert_called_once_with("echo hello world",
-timeout=300)
+    assert result.output == "hello world"
+    assert result.exit_code == 0
+    mock_sdk.commands.run.assert_called_once_with("echo hello world", timeout=300)
+
+
+def test_execute_falls_back_to_stderr_when_stdout_empty():
+    sb, mock_sdk = _make_sandbox()
+    mock_sdk.commands.run.return_value = ExecutionResult(
+        stdout="", stderr="boom", exit_code=2
+    )
+
+    result = sb.execute("false")
+
+    assert result.output == "boom"
+    assert result.exit_code == 2
 
 
 def test_execute_uses_constructor_default_timeout():
     sb, mock_sdk = _make_sandbox(timeout=120)
-    mock_sdk.commands.run.return_value = ExecuteResponse(output="", exit_code=0)
+    mock_sdk.commands.run.return_value = ExecutionResult(stdout="", stderr="", exit_code=0)
 
     sb.execute("ls")
 
@@ -43,7 +57,7 @@ def test_execute_uses_constructor_default_timeout():
 
 def test_execute_explicit_timeout_overrides_default():
     sb, mock_sdk = _make_sandbox(timeout=300)
-    mock_sdk.commands.run.return_value = ExecuteResponse(output="", exit_code=0)
+    mock_sdk.commands.run.return_value = ExecutionResult(stdout="", stderr="", exit_code=0)
 
     sb.execute("sleep 1", timeout=42)
 
@@ -52,7 +66,7 @@ def test_execute_explicit_timeout_overrides_default():
 
 def test_execute_none_timeout_falls_back_to_default():
     sb, mock_sdk = _make_sandbox(timeout=77)
-    mock_sdk.commands.run.return_value = ExecuteResponse(output="", exit_code=0)
+    mock_sdk.commands.run.return_value = ExecutionResult(stdout="", stderr="", exit_code=0)
 
     sb.execute("ls", timeout=None)
 
