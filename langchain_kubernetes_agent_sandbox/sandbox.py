@@ -1,4 +1,6 @@
 import k8s_agent_sandbox
+import requests
+from k8s_agent_sandbox.exceptions import SandboxRequestError
 
 from deepagents.backends.protocol import (
     ExecuteResponse,
@@ -6,6 +8,8 @@ from deepagents.backends.protocol import (
     FileUploadResponse,
 )
 from deepagents.backends.sandbox import BaseSandbox
+
+COMMAND_TIMEOUT_EXIT_CODE = 124
 
 class KubernetesAgentSandbox(BaseSandbox):
     def __init__(
@@ -26,7 +30,15 @@ class KubernetesAgentSandbox(BaseSandbox):
     
     def execute(self, command: str, *, timeout: int | None = None) -> ExecuteResponse:
         effective_timeout = self._get_effective_timeout(timeout)
-        return self.sandbox.commands.run(command, timeout=effective_timeout)
+        try:
+            return self.sandbox.commands.run(command, timeout=effective_timeout)
+        except SandboxRequestError as e:
+            if isinstance(e.__cause__, requests.exceptions.Timeout):
+                return ExecuteResponse(
+                    output=f"Command timed out after {effective_timeout}s",
+                    exit_code=COMMAND_TIMEOUT_EXIT_CODE,
+                )
+            raise
 
     def upload_files(self, files: list[tuple[str, bytes]]) -> list[FileUploadResponse]:
         upload_requests: list = []
