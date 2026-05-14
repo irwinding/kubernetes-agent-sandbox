@@ -42,7 +42,7 @@ Issues   = "https://github.com/irwinding/langchain-kubernetes-agent-sandbox/issu
 [tool.semantic_release]
 version_toml = ["pyproject.toml:project.version"]
 branch = "main"
-build_command = "uv build"
+build_command = false
 commit_message = "chore(release): {version} [skip ci]"
 tag_format = "v{version}"
 upload_to_pypi = false
