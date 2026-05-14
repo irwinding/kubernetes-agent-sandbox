@@ -1,0 +1,10 @@
+[project]
+name = "kubernetes-agent-sandbox"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "deepagents>=0.6.1",
+    "k8s-agent-sandbox>=0.4.5",
+]
