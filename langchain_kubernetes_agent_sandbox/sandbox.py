@@ -20,9 +20,7 @@ SANDBOX_WORKDIR = "/app"
 
 
 def _normalize_path(path: str) -> str:
-    if path.startswith(SANDBOX_WORKDIR + "/") or path == SANDBOX_WORKDIR:
-        return path
-    return f"{SANDBOX_WORKDIR}/{path.lstrip('/')}"
+    return f"{SANDBOX_WORKDIR}/{os.path.basename(path)}"
 
 class KubernetesAgentSandbox(BaseSandbox):
     def __init__(
