@@ -50,3 +50,7 @@ Thumbs.db
 .env
 .env.*
 !.env.example
+
+# Node (husky + commitlint dev tooling)
+node_modules/
+package-lock.json

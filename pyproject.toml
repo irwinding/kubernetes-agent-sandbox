@@ -38,3 +38,20 @@ asyncio_mode = "auto"
 [project.urls]
 Homepage = "https://github.com/irwinding/langchain-kubernetes-agent-sandbox"
 Issues   = "https://github.com/irwinding/langchain-kubernetes-agent-sandbox/issues"
+
+[tool.semantic_release]
+version_toml = ["pyproject.toml:project.version"]
+branch = "main"
+build_command = "uv build"
+commit_message = "chore(release): {version} [skip ci]"
+tag_format = "v{version}"
+upload_to_pypi = false
+upload_to_release = true
+
+[tool.semantic_release.commit_parser_options]
+allowed_tags = ["feat", "fix", "perf", "refactor", "docs", "chore", "test", "ci", "build", "style"]
+minor_tags = ["feat"]
+patch_tags = ["fix", "perf"]
+
+[tool.semantic_release.changelog]
+changelog_file = "CHANGELOG.md"
