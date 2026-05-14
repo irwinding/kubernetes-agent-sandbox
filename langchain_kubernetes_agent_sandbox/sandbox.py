@@ -10,10 +10,19 @@ from deepagents.backends.protocol import (
     ExecuteResponse,
     FileDownloadResponse,
     FileUploadResponse,
+    LsResult,
+    ReadResult,
 )
 from deepagents.backends.sandbox import BaseSandbox
 
 COMMAND_TIMEOUT_EXIT_CODE = 124
+SANDBOX_WORKDIR = "/app"
+
+
+def _normalize_path(path: str) -> str:
+    if path.startswith(SANDBOX_WORKDIR + "/") or path == SANDBOX_WORKDIR:
+        return path
+    return f"{SANDBOX_WORKDIR}/{path.lstrip('/')}"
 
 class KubernetesAgentSandbox(BaseSandbox):
     def __init__(
@@ -45,6 +54,12 @@ class KubernetesAgentSandbox(BaseSandbox):
             raise
         output = result.stdout if result.stdout else result.stderr
         return ExecuteResponse(output=output, exit_code=result.exit_code)
+
+    def ls(self, path: str) -> LsResult:
+        return super().ls(_normalize_path(path))
+
+    def read(self, file_path: str, offset: int = 0, limit: int = 2000) -> ReadResult:
+        return super().read(_normalize_path(file_path), offset=offset, limit=limit)
 
     def upload_files(self, files: list[tuple[str, bytes]]) -> list[FileUploadResponse]:
         responses: list[FileUploadResponse] = []
