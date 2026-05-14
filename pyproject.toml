@@ -42,7 +42,7 @@ Issues   = "https://github.com/irwinding/langchain-kubernetes-agent-sandbox/issu
 [tool.semantic_release]
 version_toml = ["pyproject.toml:project.version"]
 branch = "main"
-build_command = false
+build_command = ""
 commit_message = "chore(release): {version} [skip ci]"
 tag_format = "v{version}"
 upload_to_pypi = false
@@ -53,5 +53,5 @@ allowed_tags = ["feat", "fix", "perf", "refactor", "docs", "chore", "test", "ci"
 minor_tags = ["feat"]
 patch_tags = ["fix", "perf"]
 
-[tool.semantic_release.changelog]
+[tool.semantic_release.changelog.default_templates]
 changelog_file = "CHANGELOG.md"
