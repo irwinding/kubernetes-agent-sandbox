@@ -28,10 +28,27 @@ class KubernetesAgentSandbox(BaseSandbox):
         effective_timeout = self._get_effective_timeout(timeout)
         return self.sandbox.commands.run(command, timeout=effective_timeout)
 
-    def upload_files(self, files: list[tuple]):
-        return super().upload_files(files)
-    
-    def download_files(self, paths: list[str]):
+    def upload_files(self, files: list[tuple[str, bytes]]) -> list[FileUploadResponse]:
+        upload_requests: list = []
+        responses: dict[str, FileUploadResponse] = {}
+        for path, content in files:
+            if not path.startswith("/"):
+                responses[path] = FileUploadResponse(path=path, success=False, error="Path must be absolute")
+                continue
+            upload_requests.append((path, content))
+            responses[path] = FileUploadResponse(path=path, success=False, error=None)
+        
+        # Process upload requests
+        for path, content in upload_requests:
+            try:
+                self.sandbox.filesystem.write(path, content)
+                responses[path] = FileUploadResponse(path=path, success=True, error=None)
+            except Exception as e:
+                responses[path] = FileUploadResponse(path=path, success=False, error=str(e))
+
+        return list(responses.values())
+
+    def download_files(self, paths: list[str]) -> list[FileDownloadResponse]:
         download_requests: list = []
         responses: dict[str, FileDownloadResponse] = {}
         
@@ -56,4 +73,4 @@ class KubernetesAgentSandbox(BaseSandbox):
             except Exception as e:
                 responses[path] = FileDownloadResponse(path=path, content=None, error=str(e))
         
-        return responses.values()
+        return list(responses.values())
