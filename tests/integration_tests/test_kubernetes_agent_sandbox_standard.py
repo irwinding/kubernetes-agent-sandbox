@@ -14,6 +14,7 @@ Run locally with:
     K8S_SANDBOX_TEMPLATE=<template-name> \\
     uv run python -m pytest tests/integration_tests
 """
+
 from __future__ import annotations
 
 import os

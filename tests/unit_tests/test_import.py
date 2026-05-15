@@ -1,4 +1,4 @@
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
 
 import pytest
 import requests
@@ -8,9 +8,6 @@ from k8s_agent_sandbox.models import ExecutionResult
 import langchain_kubernetes_agent_sandbox
 from langchain_kubernetes_agent_sandbox.sandbox import KubernetesAgentSandbox
 
-from deepagents.backends.sandbox import (
-    ExecuteResponse,
-)
 
 def _make_sandbox(*, timeout: int = 300) -> tuple[KubernetesAgentSandbox, MagicMock]:
     mock_sdk = MagicMock()
@@ -18,9 +15,11 @@ def _make_sandbox(*, timeout: int = 300) -> tuple[KubernetesAgentSandbox, MagicM
     sb = KubernetesAgentSandbox(sandbox=mock_sdk, timeout=timeout)
     return sb, mock_sdk
 
+
 def test_import_kubernetes_agent_sandbox():
     assert langchain_kubernetes_agent_sandbox is not None
-    
+
+
 def test_execute_returns_stdout():
     sb, mock_sdk = _make_sandbox()
     mock_sdk.commands.run.return_value = ExecutionResult(
@@ -48,7 +47,9 @@ def test_execute_falls_back_to_stderr_when_stdout_empty():
 
 def test_execute_uses_constructor_default_timeout():
     sb, mock_sdk = _make_sandbox(timeout=120)
-    mock_sdk.commands.run.return_value = ExecutionResult(stdout="", stderr="", exit_code=0)
+    mock_sdk.commands.run.return_value = ExecutionResult(
+        stdout="", stderr="", exit_code=0
+    )
 
     sb.execute("ls")
 
@@ -57,7 +58,9 @@ def test_execute_uses_constructor_default_timeout():
 
 def test_execute_explicit_timeout_overrides_default():
     sb, mock_sdk = _make_sandbox(timeout=300)
-    mock_sdk.commands.run.return_value = ExecutionResult(stdout="", stderr="", exit_code=0)
+    mock_sdk.commands.run.return_value = ExecutionResult(
+        stdout="", stderr="", exit_code=0
+    )
 
     sb.execute("sleep 1", timeout=42)
 
@@ -66,7 +69,9 @@ def test_execute_explicit_timeout_overrides_default():
 
 def test_execute_none_timeout_falls_back_to_default():
     sb, mock_sdk = _make_sandbox(timeout=77)
-    mock_sdk.commands.run.return_value = ExecutionResult(stdout="", stderr="", exit_code=0)
+    mock_sdk.commands.run.return_value = ExecutionResult(
+        stdout="", stderr="", exit_code=0
+    )
 
     sb.execute("ls", timeout=None)
 
