@@ -1,6 +1,25 @@
 # CHANGELOG
 
 
+## v0.2.0 (2026-05-15)
+
+### Chores
+
+- Allow PRs
+  ([`781e132`](https://github.com/irwinding/langchain-kubernetes-agent-sandbox/commit/781e13289cc87c7794927c7e2fbb3d7a6067874f))
+
+- Update README.md
+  ([`92e1ac2`](https://github.com/irwinding/langchain-kubernetes-agent-sandbox/commit/92e1ac24170e15304a54b4407765cfcb85928251))
+
+### Features
+
+- Add publish to pypi workflow
+  ([`6d126cf`](https://github.com/irwinding/langchain-kubernetes-agent-sandbox/commit/6d126cf03567efa47176beb88f109bca915ae1c9))
+
+- Add publish to pypi workflow
+  ([`6d4a82f`](https://github.com/irwinding/langchain-kubernetes-agent-sandbox/commit/6d4a82f1faf0d47fce0444f953ceaff0e10dc733))
+
+
 ## v0.1.0 (2026-05-14)
 
 ### Bug Fixes
