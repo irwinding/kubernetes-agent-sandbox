@@ -1,6 +1,19 @@
 # CHANGELOG
 
 
+## v0.2.1 (2026-05-15)
+
+### Bug Fixes
+
+- Trigger workflows
+  ([`8eba9c5`](https://github.com/irwinding/langchain-kubernetes-agent-sandbox/commit/8eba9c5b38db559b3ba4ac8afbd74c6a1cf1bdf8))
+
+### Chores
+
+- Change GITHUB_TOKEN to RELEASE_TOKEN in release workflow
+  ([`a26e399`](https://github.com/irwinding/langchain-kubernetes-agent-sandbox/commit/a26e399c7dc5c012821b4b62ad739a2e2d982a05))
+
+
 ## v0.2.0 (2026-05-15)
 
 ### Chores
