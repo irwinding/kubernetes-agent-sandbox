@@ -11,7 +11,6 @@ from deepagents.backends.sandbox import BaseSandbox
 
 COMMAND_TIMEOUT_EXIT_CODE = 124
 
-
 class KubernetesAgentSandbox(BaseSandbox):
     def __init__(
         self,
